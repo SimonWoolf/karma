@@ -57,13 +57,6 @@ var Karma = function (socket, iframe, opener, navigator, location) {
       return contextWindow.__karma__.error.apply(contextWindow.__karma__, arguments)
     }
 
-    contextWindow.onbeforeunload = function (e, b) {
-      if (!reloadingContext) {
-        // TODO(vojta): show what test (with explanation about jasmine.UPDATE_INTERVAL)
-        contextWindow.__karma__.error('Some of your tests did a full page reload!')
-      }
-    }
-
     if (self.config.captureConsole) {
       // patch the console
       var localConsole = contextWindow.console = getConsole(contextWindow)
