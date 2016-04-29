@@ -5,7 +5,6 @@ var util = require('./util')
 var Karma = function (socket, iframe, opener, navigator, location) {
   var hasError = false
   var startEmitted = false
-  var reloadingContext = false
   var store = {}
   var self = this
   var queryParams = util.parseQueryParams(location.search)
@@ -58,13 +57,6 @@ var Karma = function (socket, iframe, opener, navigator, location) {
       return contextWindow.__karma__.error.apply(contextWindow.__karma__, arguments)
     }
 
-    contextWindow.onbeforeunload = function (e, b) {
-      if (!reloadingContext) {
-        // TODO(vojta): show what test (with explanation about jasmine.UPDATE_INTERVAL)
-        contextWindow.__karma__.error('Some of your tests did a full page reload!')
-      }
-    }
-
     if (self.config.captureConsole) {
       // patch the console
       var localConsole = contextWindow.console = getConsole(contextWindow)
@@ -106,8 +98,6 @@ var Karma = function (socket, iframe, opener, navigator, location) {
   this.stringify = stringify
 
   var clearContext = function () {
-    reloadingContext = true
-
     navigateContextTo('about:blank')
   }
 
@@ -215,8 +205,6 @@ var Karma = function (socket, iframe, opener, navigator, location) {
     hasError = false
     startEmitted = false
     self.config = cfg
-    // if not clearing context, reloadingContext always true to prevent beforeUnload error
-    reloadingContext = !self.config.clearContext
     navigateContextTo(constant.CONTEXT_URL)
 
     // clear the console before run
